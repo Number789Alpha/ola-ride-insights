@@ -897,9 +897,9 @@ elif selected_page == "💰 03 - Revenue Analysis":
         
         st.markdown("""
         <div class="explanation-card">
-            <div class="explanation-heading">📌 Graph Explanation: High-Value Customer Concentration</div>
+            <div class="explanation-heading">📌 Graph Explanation: Top Customer Contribution</div>
             <p class="explanation-body">
-                <span class="insight-badge">What it tells</span> Identifies the platform's top patron spenders. Individual top customers have accumulated spend between <b>₹2,200 and ₹2,600+</b> across 4 to 5 premium long-haul rides in July alone.
+                <span class="insight-badge">Top Customer Contribution</span> The highest-spending customers contribute approximately <b>₹6,000 each</b> in booking value, indicating that a small group of customers accounts for a higher share of total booking value.
             </p>
             <p class="explanation-body">
                 <span class="recommend-badge">Strategic Action</span> Enroll these high-frequency, high-ticket accounts in an exclusive OLA Corporate / VIP pass program with zero surge fees and dedicated customer support to protect high-margin retention.
@@ -1203,9 +1203,9 @@ elif selected_page == "⭐ 05 - Ratings Analysis":
         
         st.markdown("""
         <div class="explanation-card">
-            <div class="explanation-heading">📌 Graph Explanation: Driver Performance Sentiment</div>
+            <div class="explanation-heading">📌 Graph Explanation: Rating Distribution</div>
             <p class="explanation-body">
-                <span class="insight-badge">What it tells</span> Driver scores range strictly between <b>3.0 and 5.0</b> with a mean score of <b>3.998</b>. The distribution is normally dispersed centered at 4.0, indicating solid baseline service reliability without severe punitive tail risk.
+                <span class="insight-badge">Rating Distribution</span> Customer and driver ratings are relatively evenly distributed across the 3.0–5.0 range, rather than following a clear normal distribution. This indicates a broad spread of ratings, with no strong concentration around a single rating value.
             </p>
             <p class="explanation-body">
                 <span class="recommend-badge">Strategic Action</span> Drivers maintaining >4.8 ratings over 100 consecutive trips should be unlocked for premium Prime Plus dispatch queues and elevated bonus tiers.
@@ -1232,7 +1232,7 @@ elif selected_page == "⭐ 05 - Ratings Analysis":
         <div class="explanation-card">
             <div class="explanation-heading">📌 Graph Explanation: Passenger Etiquette Sentiment</div>
             <p class="explanation-body">
-                <span class="insight-badge">What it tells</span> Drivers rate passengers between <b>3.0 and 5.0</b> with an average of <b>3.998</b>, mirroring driver ratings with near-perfect statistical symmetry.
+                <span class="insight-badge">Rating Distribution</span> Customer and driver ratings are relatively evenly distributed across the 3.0–5.0 range, rather than following a clear normal distribution. This indicates a broad spread of ratings, with no strong concentration around a single rating value.
             </p>
             <p class="explanation-body">
                 <span class="recommend-badge">Strategic Action</span> Drivers rate riders fairly without systematic retaliatory bias, indicating high mutual trust and balanced two-way accountability across the platform.

@@ -128,7 +128,7 @@ The database (`ola_bookings` table) captures **103,024 rides** across Bangalore 
 ### 3. 03 - Revenue Analysis
 * **About Section**: Financial monetization channels, payment gateway distribution, and high-frequency patron accounts.
 * **Visuals**: Revenue by Payment Method, Top 5 Customers by Booking Value, Daily Revenue & Distance Alignment.
-* **Key Takeaway**: Cash generates ₹19.23M (54.8%) while UPI delivers ₹14.20M (40.5%). Top customers spent ₹2,200 - ₹2,600+ across 4-5 premium rides.
+* **Key Takeaway**: Cash generates ₹19.23M (54.8%) while UPI delivers ₹14.20M (40.5%). **Top Customer Contribution:** The highest-spending customers contribute approximately ₹6,000 each in booking value, indicating that a small group of customers accounts for a higher share of total booking value.
 
 ### 4. 04 - Cancellation Analysis
 * **About Section**: Root-cause diagnostics on booking drop-offs, driver rejections, and mid-trip aborts.
@@ -138,7 +138,7 @@ The database (`ola_bookings` table) captures **103,024 rides** across Bangalore 
 ### 5. 05 - Ratings Analysis
 * **About Section**: Evaluates mutual customer-driver satisfaction, score distributions, and vehicle tier sentiment parity.
 * **Visuals**: Driver Ratings Distribution, Customer Ratings Distribution, Cross-Category Rating Comparison.
-* **Key Takeaway**: Remarkable statistical symmetry with identical 3.998 averages for both drivers and riders.
+* **Key Takeaway**: **Rating Distribution:** Customer and driver ratings are relatively evenly distributed across the 3.0–5.0 range, rather than following a clear normal distribution. This indicates a broad spread of ratings, with no strong concentration around a single rating value. Mutual averages center around 3.998 for both drivers and riders.
 
 ### 6. ⚡ Interactive SQL Query Studio
 * **Capabilities**: Execute any of the 10 core SQL questions live, inspect query execution time in milliseconds, and run custom queries in an interactive SQL terminal.
