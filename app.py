@@ -710,18 +710,13 @@ elif selected_page == "🚗 02 - Vehicle Analysis":
         st.subheader("💵 Total vs Successful Booking Value")
         v_val_sorted = v_stats.sort_values(by='Total_Val', ascending=False)
         
-        # Calculate successful booking value by vehicle
-        succ_val = df[df['Booking_Status'] == 'Success'].groupby('Vehicle_Type')['Booking_Value'].sum().reset_index()
-        succ_val.columns = ['Vehicle_Type', 'Success_Val']
-        merged_val = pd.merge(v_val_sorted, succ_val, on='Vehicle_Type')
-        
         fig_val = go.Figure()
         fig_val.add_trace(go.Bar(
-            x=merged_val['Vehicle_Type'], y=merged_val['Total_Val'],
+            x=v_val_sorted['Vehicle_Type'], y=v_val_sorted['Total_Val'],
             name='Total Requested Value', marker_color='#3B82F6'
         ))
         fig_val.add_trace(go.Bar(
-            x=merged_val['Vehicle_Type'], y=merged_val['Success_Val'],
+            x=v_val_sorted['Vehicle_Type'], y=v_val_sorted['Success_Val'],
             name='Realized Successful Value', marker_color='#D2E603'
         ))
         fig_val.update_layout(
