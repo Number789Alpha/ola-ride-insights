@@ -21,6 +21,53 @@ Deriving actionable unit-economic visibility from this volume requires full-stac
 
 ---
 
+## 📑 About the Dataset
+
+The project is powered by the **master OLA Ride Bookings Dataset (`OLA_DataSet.xlsx`)**, capturing exhaustive trip-level operational and behavioral telematics from **July 1, 2024 to July 31, 2024**.
+
+### 📊 Dataset Summary Matrix
+* **Total Records:** `103,024` ride requests
+* **Total Attributes:** `20` dimensions & metrics
+* **Temporal Granularity:** Full 31-day operational window in July 2024 (continuous 24/7 logging)
+* **Domain:** Ride-Sharing, Fleet Allocation, Pricing Dynamics & Micro-Mobility
+* **Master Source File:** `OLA_DataSet.xlsx` (Sheet: `July`, 11.8 MB)
+
+### 🗂️ Data Dictionary & Schema Specification
+
+| Column Name | Data Type | Null Count | Description & Value Domain |
+|---|---|---|---|
+| `Date` | DATETIME | 0 | Date and hour of booking intake (`2024-07-01` to `2024-07-31`). |
+| `Time` | TIME | 0 | Timestamp of ride request (`HH:MM:SS`). |
+| `Booking_ID` | VARCHAR(20) | 0 | Unique booking transaction ID (e.g., `CNR7153255142`). |
+| `Booking_Status` | VARCHAR(30) | 0 | Outcome status: `Success` (63,967), `Canceled by Driver` (18,434), `Canceled by Customer` (10,499), `Driver Not Found` (10,124). |
+| `Customer_ID` | VARCHAR(20) | 0 | Unique rider profile identifier (e.g., `CID713523`). |
+| `Vehicle_Type` | VARCHAR(25) | 0 | Fleet category: `Auto`, `Bike`, `eBike`, `Mini`, `Prime Sedan`, `Prime SUV`, `Prime Plus`. |
+| `Pickup_Location` | VARCHAR(100) | 0 | Origin pickup zone/locality across urban hubs. |
+| `Drop_Location` | VARCHAR(100) | 0 | Destination termination landmark. |
+| `V_TAT` | FLOAT | 39,057 | Vehicle Turn Around Time: Driver dispatch to pickup arrival duration in seconds. |
+| `C_TAT` | FLOAT | 39,057 | Customer Turn Around Time: Rider arrival to trip commencement duration in seconds. |
+| `Canceled_Rides_by_Customer` | VARCHAR(100) | 92,525 | Stated reason for rider cancellation (*Driver not moving towards pickup, Driver asked to cancel, Change of plans, AC not working, Wrong address*). |
+| `Canceled_Rides_by_Driver` | VARCHAR(100) | 84,590 | Stated reason for driver cancellation (*Personal & car related issue, Customer related issue, Customer coughing/sick, Over-capacity*). |
+| `Incomplete_Rides` | VARCHAR(5) | 39,057 | Flag (`Yes` / `No`) indicating premature trip abortion mid-journey (3,926 rides). |
+| `Incomplete_Rides_Reason` | VARCHAR(50) | 99,098 | Root-cause for premature trip termination (*Customer Demand*, *Vehicle Breakdown*, *Other Issue*). |
+| `Booking_Value` | DECIMAL(10,2) | 0 | Total fare value in INR (₹) quoted/transacted. |
+| `Payment_Method` | VARCHAR(20) | 39,057 | Settlement mode for completed trips: `Cash` (35,022), `UPI` (25,881), `Credit Card` (2,435), `Debit Card` (629). |
+| `Ride_Distance` | DECIMAL(6,2) | 0 | Total trip mileage traversed in Kilometers (KM). |
+| `Driver_Ratings` | FLOAT | 39,057 | Rating awarded by passenger to driver partner (Scale: 1.0 - 5.0). |
+| `Customer_Rating` | FLOAT | 39,057 | Rating awarded by driver partner to passenger (Scale: 1.0 - 5.0). |
+| `Vehicle Images` | VARCHAR(255) | 0 | External reference link to category icon graphics. |
+
+### 🧹 Data Cleaning & Treatment Protocol
+1. **Handling of Operational Nulls**:
+   - The attributes `Payment_Method`, `Driver_Ratings`, `Customer_Rating`, `V_TAT`, and `C_TAT` contain exactly **39,057 null values**. This is an authentic business characteristic: non-successful rides (`18,434 driver cancels + 10,499 customer cancels + 10,124 unassigned`) never conclude a physical trip or financial transaction. These were deliberately preserved as legitimate operational nulls rather than artificially corrupted with mean/mode imputation.
+2. **Cancellation Reason Tracking**:
+   - `Canceled_Rides_by_Customer` contains 10,499 populated records, perfectly matching the 10,499 customer cancellation events.
+   - `Canceled_Rides_by_Driver` contains 18,434 populated records, perfectly matching driver cancellation events.
+3. **Database Normalization & Performance Caching**:
+   - The master dataset is compiled into an embedded SQLite database (`ola_rides.db`) under table `ola_bookings` and cached as `ola_rides.csv` for sub-second page loads in the Streamlit application.
+
+---
+
 ## 🏗️ Technical Architecture & Pipeline
 
 ```
