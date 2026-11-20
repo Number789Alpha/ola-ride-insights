@@ -26,16 +26,18 @@ WHERE Booking_Status = 'Success';
 
 
 -- --------------------------------------------------------------------
--- 2. Find the average ride distance for each vehicle type
--- Business Context: Determines fleet trip characteristics and micro-mobility vs sedan range.
+-- 2. Find the average ride distance for each vehicle type (Successful Rides)
+-- Business Context: Calculates Average Ride Distance per Successful Ride, aligned with Power BI.
+-- Reference Values: ~22.85 KM overall average, ~10 KM for Auto, and ~25 KM for cabs & 2-wheelers.
 -- --------------------------------------------------------------------
 SELECT 
     Vehicle_Type,
     ROUND(AVG(Ride_Distance), 2) AS Avg_Distance_KM,
     ROUND(MIN(Ride_Distance), 2) AS Min_Distance_KM,
     ROUND(MAX(Ride_Distance), 2) AS Max_Distance_KM,
-    COUNT(Booking_ID) AS Total_Trips
+    COUNT(Booking_ID) AS Successful_Trips
 FROM ola_bookings
+WHERE Booking_Status = 'Success'
 GROUP BY Vehicle_Type
 ORDER BY Avg_Distance_KM DESC;
 

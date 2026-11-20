@@ -101,7 +101,7 @@ The database (`ola_bookings` table) captures **103,024 rides** across Bangalore 
 | # | Business Question | SQL Logic Highlights | Key Operational Benchmark |
 |---|---|---|---|
 | **1** | **Retrieve all successful bookings** | `WHERE Booking_Status = 'Success'` | **63,967 completed rides** (**62.09% conversion rate**). |
-| **2** | **Average ride distance by vehicle type** | `GROUP BY Vehicle_Type, AVG(Ride_Distance)` | **Prime Sedan** leads (15.76 KM); **Auto** serves micro-transit (6.24 KM). |
+| **2** | **Average ride distance by vehicle type** | `WHERE Booking_Status = 'Success' GROUP BY Vehicle_Type` | **Average Ride Distance per Successful Ride:** ~**22.85 KM** overall, ~**10 KM** for Auto, ~**25 KM** for cabs & bikes. |
 | **3** | **Total cancelled rides by customers** | `WHERE Booking_Status = 'Canceled by Customer'` | **10,499 bookings (10.19%)** dropped off by riders. |
 | **4** | **Top 5 customers by ride volume** | `GROUP BY Customer_ID ORDER BY COUNT(*) DESC LIMIT 5` | Customer `CID954071` booked 5 rides; 4 riders tied with 4 trips. |
 | **5** | **Driver cancellations (Personal & Car issues)** | `WHERE Canceled_Rides_by_Driver = 'Personal & Car related issue'` | **6,542 rides**; accounts for **35.49%** of driver cancellations. |
@@ -123,7 +123,7 @@ The database (`ola_bookings` table) captures **103,024 rides** across Bangalore 
 ### 2. 02 - Vehicle Analysis
 * **About Section**: Dissects fleet performance across Auto, Bike, eBike, Mini, Prime Sedan, Prime SUV, and Prime Plus.
 * **Visuals**: Top 5 Vehicle Types by Cumulative Distance, Total Requested vs Realized Booking Value, 100% Outcome Parity Stack.
-* **Key Takeaway**: Prime Sedan covers the highest mileage (234.5k KM). Cancellation rates stay tightly clustered (17.6% - 18.1%) across all vehicle classes.
+* **Key Takeaway**: **Average Ride Distance per Successful Ride** is approximately **22.85 km overall** and **10 km for Auto** (cabs and 2-wheelers average ~25 km). Total mileage on successful trips is led by eBike, Prime Sedan, and Prime Plus. Cancellation rates stay tightly clustered (17.6% - 18.1%) across all vehicle classes.
 
 ### 3. 03 - Revenue Analysis
 * **About Section**: Financial monetization channels, payment gateway distribution, and high-frequency patron accounts.

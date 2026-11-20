@@ -394,8 +394,12 @@ if selected_page == "📊 01 - Overall Performance":
     tot_value = df['Booking_Value'].sum()
     succ_bookings = (df['Booking_Status'] == 'Success').sum()
     succ_rate = (succ_bookings / tot_bookings * 100) if tot_bookings > 0 else 0
-    tot_distance = df['Ride_Distance'].sum()
-    avg_distance = df['Ride_Distance'].mean() if tot_bookings > 0 else 0
+    
+    # Calculate distance metrics based on successful rides to align with Power BI
+    succ_df_all = df[df['Booking_Status'] == 'Success']
+    tot_distance_succ = succ_df_all['Ride_Distance'].sum()
+    avg_distance_succ = succ_df_all['Ride_Distance'].mean() if len(succ_df_all) > 0 else 0
+    
     driver_cancels = (df['Booking_Status'] == 'Canceled by Driver').sum()
     cust_cancels = (df['Booking_Status'] == 'Canceled by Customer').sum()
     dnf_cancels = (df['Booking_Status'] == 'Driver Not Found').sum()
@@ -436,9 +440,9 @@ if selected_page == "📊 01 - Overall Performance":
     with col5:
         st.markdown(f"""
         <div class="kpi-card">
-            <div class="kpi-label">Total Distance</div>
-            <div class="kpi-value">{tot_distance/1e3:.1f}k KM</div>
-            <div class="kpi-sub">Avg {avg_distance:.1f} KM/Trip</div>
+            <div class="kpi-label">Average Ride Distance per Successful Ride</div>
+            <div class="kpi-value">{avg_distance_succ:.2f} KM</div>
+            <div class="kpi-sub">Total: {tot_distance_succ/1e3:.1f}k KM Covered</div>
         </div>
         """, unsafe_allow_html=True)
         
@@ -487,7 +491,7 @@ if selected_page == "📊 01 - Overall Performance":
                 <span class="insight-badge">Key Insight</span> The consistent ~38% delta between total bookings and successful rides illustrates systemic attrition across all days of the month without any single day collapse, proving that drop-offs are operational rather than technical outages.
             </p>
             <p class="explanation-body">
-                <span class="recommend-badge">Strategic Action</span> Implement predictive driver repositioning 45 minutes prior to peak weekend demand spikes to convert an estimated 8-12% of currently unfulfilled requests into realized GMV.
+                <span class="recommend-badge">Strategic Action</span> Implement predictive driver repositioning prior to peak weekend demand periods to improve fulfillment of unassigned booking requests into realized GMV.
             </p>
         </div>
         """, unsafe_allow_html=True)
@@ -616,15 +620,22 @@ elif selected_page == "🚗 02 - Vehicle Analysis":
     </div>
     """, unsafe_allow_html=True)
     
-    # Vehicle Category Cards Row
-    v_stats = df.groupby('Vehicle_Type').agg(
-        Total_Trips=('Booking_ID', 'count'),
-        Success_Trips=('Is_Success', 'sum'),
-        Avg_Dist=('Ride_Distance', 'mean'),
-        Tot_Dist=('Ride_Distance', 'sum'),
-        Total_Val=('Booking_Value', 'sum'),
-        Avg_Val=('Booking_Value', 'mean')
+    # Vehicle Category Cards Row - Filter Booking_Status == 'Success' for distance metrics to align with Power BI
+    v_succ = df[df['Booking_Status'] == 'Success'].groupby('Vehicle_Type').agg(
+        Success_Trips=('Booking_ID', 'count'),
+        Avg_Dist_Succ=('Ride_Distance', 'mean'),
+        Tot_Dist_Succ=('Ride_Distance', 'sum'),
+        Success_Val=('Booking_Value', 'sum')
     ).reset_index()
+    
+    v_total = df.groupby('Vehicle_Type').agg(
+        Total_Trips=('Booking_ID', 'count'),
+        Total_Val=('Booking_Value', 'sum')
+    ).reset_index()
+    
+    v_stats = pd.merge(v_total, v_succ, on='Vehicle_Type', how='left')
+    v_stats['Avg_Dist_Succ'] = v_stats['Avg_Dist_Succ'].fillna(0)
+    v_stats['Tot_Dist_Succ'] = v_stats['Tot_Dist_Succ'].fillna(0)
     
     st.markdown("### 🚘 Fleet Category Summary Matrix")
     
@@ -646,7 +657,7 @@ elif selected_page == "🚗 02 - Vehicle Analysis":
             <div class="kpi-card" style="padding:12px; text-align:center;">
                 <div style="font-size:12px; font-weight:700; color:#D2E603; margin-bottom:4px;">{v_name}</div>
                 <div style="font-size:18px; font-weight:700; color:#FFFFFF;">{row['Total_Trips']:,}</div>
-                <div style="font-size:11px; color:#94A3B8;">Avg: {row['Avg_Dist']:.1f} KM</div>
+                <div style="font-size:11px; color:#94A3B8;">Avg: {row['Avg_Dist_Succ']:.2f} KM</div>
                 <div style="font-size:11px; color:#10B981;">₹{row['Total_Val']/1e6:.2f}M</div>
             </div>
             """, unsafe_allow_html=True)
@@ -657,40 +668,40 @@ elif selected_page == "🚗 02 - Vehicle Analysis":
     c1, c2 = st.columns(2)
     
     with c1:
-        st.subheader("📏 Top Vehicle Types by Ride Distance")
-        v_dist_sorted = v_stats.sort_values(by='Tot_Dist', ascending=True)
+        st.subheader("📏 Top Vehicle Types by Ride Distance (Successful Rides)")
+        v_dist_sorted = v_stats.sort_values(by='Tot_Dist_Succ', ascending=True)
         
         fig_dist = go.Figure(go.Bar(
-            x=v_dist_sorted['Tot_Dist'],
+            x=v_dist_sorted['Tot_Dist_Succ'],
             y=v_dist_sorted['Vehicle_Type'],
             orientation='h',
             marker=dict(
-                color=v_dist_sorted['Tot_Dist'],
+                color=v_dist_sorted['Tot_Dist_Succ'],
                 colorscale='Viridis',
                 showscale=False
             ),
-            text=[f"{val:,.0f} KM" for val in v_dist_sorted['Tot_Dist']],
+            text=[f"{val:,.0f} KM" for val in v_dist_sorted['Tot_Dist_Succ']],
             textposition='auto'
         ))
         fig_dist.update_layout(
             paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
             font=dict(color='#E2E8F0'), height=380,
-            xaxis_title="Total Distance Covered (KM)", yaxis_title="Vehicle Type",
+            xaxis_title="Total Distance Covered on Successful Rides (KM)", yaxis_title="Vehicle Type",
             margin=dict(l=20, r=20, t=30, b=20)
         )
         st.plotly_chart(fig_dist, use_container_width=True)
         
         st.markdown("""
         <div class="explanation-card">
-            <div class="explanation-heading">📌 Graph Explanation: Total Cumulative Mileage</div>
+            <div class="explanation-heading">📌 Graph Explanation: Average Ride Distance per Successful Ride</div>
             <p class="explanation-body">
-                <span class="insight-badge">What it tells</span> <b>Prime Sedan</b> generates the highest cumulative mileage (~234k KM), followed closely by <b>eBike</b> (~230k KM), <b>Bike</b> (~227k KM), and <b>Mini</b> (~225k KM). <b>Auto</b> records the lowest aggregate distance (~92k KM).
+                <span class="insight-badge">Power BI Aligned Metric</span> Filtering for completed successful rides aligns with Power BI reference metrics: the overall <b>Average Ride Distance per Successful Ride</b> is approximately <b>22.85 km</b> across all categories.
             </p>
             <p class="explanation-body">
-                <span class="insight-badge">Why Auto Differs</span> Auto operates as an intra-neighborhood short-hop connector with an average trip distance of just <b>6.24 KM</b>, whereas all cab and 2-wheeler tiers average <b>15.3 - 15.8 KM</b> per trip.
+                <span class="insight-badge">Vehicle Averages</span> <b>Auto</b> records an <b>Average Ride Distance per Successful Ride</b> of approximately <b>10.04 km (approx 10 km)</b>, acting as a dedicated intra-neighborhood connector. Meanwhile, all 2-wheeler and cab tiers maintain long-haul urban averages between <b>24.9 km and 25.1 km</b> (eBike: 25.15 km, Prime Plus: 25.03 km, Prime Sedan: 25.01 km, Mini: 24.98 km, Bike: 24.93 km, Prime SUV: 24.88 km).
             </p>
             <p class="explanation-body">
-                <span class="recommend-badge">Strategic Action</span> Price Auto rides on a rapid base-fare model optimized for turnarounds, while promoting Prime Sedan/SUV packages for inter-city and airport transit.
+                <span class="recommend-badge">Strategic Action</span> Price Auto rides on a rapid turnaround base-fare model for ~10 km intra-city hops, while optimizing 4-wheeler and 2-wheeler allocation for ~25 km arterial transit corridors.
             </p>
         </div>
         """, unsafe_allow_html=True)
@@ -729,7 +740,7 @@ elif selected_page == "🚗 02 - Vehicle Analysis":
                 <span class="insight-badge">What it tells</span> Compares gross demand GMV against actual fulfilled revenue. Total requested booking value reaches ₹56.76M across all vehicles, but realized revenue stands at <b>₹35.08M</b> (a ~38.2% gross revenue leakage caused by cancellations and driver unavailability).
             </p>
             <p class="explanation-body">
-                <span class="recommend-badge">Strategic Action</span> Prime Sedan and Prime SUV represent the highest monetary leakage per cancelled trip due to their premium tariffs. Reducing cancellations in Prime tiers by 5% recovers over ₹1.1M monthly in high-margin revenue.
+                <span class="recommend-badge">Strategic Action</span> Prime Sedan and Prime SUV represent the highest monetary gap between requested and realized booking value due to their premium tariffs. Prioritizing driver availability and retention in Prime tiers helps minimize high-margin revenue loss.
             </p>
         </div>
         """, unsafe_allow_html=True)
@@ -1271,10 +1282,10 @@ elif selected_page == "⭐ 05 - Ratings Analysis":
         <div class="explanation-heading">📌 Graph Explanation: Rating Equilibrium Across Categories</div>
         <p class="explanation-body">
             <span class="insight-badge">What it tells</span> Customer and driver ratings stay remarkably uniform across all vehicle categories:
-            <b>Prime Plus</b> marginally leads in customer ratings (4.009), while <b>Prime Sedan</b> leads in driver satisfaction (4.001). <b>eBike</b> and <b>Bike</b> show slight decreases (3.988 - 3.993), attributable to weather exposure and helmet comfort.
+            <b>Prime Plus</b> marginally leads in customer ratings (4.009), while <b>Prime Sedan</b> leads in driver satisfaction (4.001). <b>eBike</b> and <b>Bike</b> show slight variations (3.988 - 3.993), reflecting minor differences across vehicle categories.
         </p>
         <p class="explanation-body">
-            <span class="recommend-badge">Strategic Action</span> Inspect bike fleet sanitization and provide branded disposable hairnets / clean helmets to close the slight 0.02 gap on 2-wheeler satisfaction scores.
+            <span class="recommend-badge">Strategic Action</span> Maintain consistent quality assurance and driver onboarding standards across all vehicle tiers to sustain rating benchmarks above 4.0 across the fleet.
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -1313,9 +1324,9 @@ elif selected_page == "⚡ SQL Query Studio & Benchmark":
             "insight": "Out of 103,024 booking requests, <b>63,967 (62.09%)</b> were successfully completed, establishing the core baseline conversion rate."
         },
         "2. Find the average ride distance for each vehicle type": {
-            "query": "SELECT Vehicle_Type, ROUND(AVG(Ride_Distance), 2) AS Avg_Distance_KM, ROUND(MIN(Ride_Distance), 2) AS Min_Distance_KM, ROUND(MAX(Ride_Distance), 2) AS Max_Distance_KM, COUNT(Booking_ID) AS Total_Trips FROM ola_bookings GROUP BY Vehicle_Type ORDER BY Avg_Distance_KM DESC;",
-            "desc": "Calculates fleet average trip length to distinguish micro-mobility from cab journeys.",
-            "insight": "<b>Prime Sedan</b> clocks the longest average distance (15.76 KM), while <b>Auto</b> serves localized micro-trips with an average of 6.24 KM."
+            "query": "SELECT Vehicle_Type, ROUND(AVG(Ride_Distance), 2) AS Avg_Distance_KM, ROUND(MIN(Ride_Distance), 2) AS Min_Distance_KM, ROUND(MAX(Ride_Distance), 2) AS Max_Distance_KM, COUNT(Booking_ID) AS Successful_Trips FROM ola_bookings WHERE Booking_Status = 'Success' GROUP BY Vehicle_Type ORDER BY Avg_Distance_KM DESC;",
+            "desc": "Calculates Average Ride Distance per Successful Ride, aligned with Power BI metrics.",
+            "insight": "Filtered for completed successful rides (aligned with Power BI): overall average ride distance is approximately <b>22.85 km</b>. <b>eBike</b> leads at 25.15 km, cab tiers average ~25.0 km, and <b>Auto</b> records an average of <b>10.04 km (approx 10 km)</b>."
         },
         "3. Get the total number of cancelled rides by customers": {
             "query": "SELECT COUNT(Booking_ID) AS Total_Cancelled_By_Customer, ROUND(COUNT(Booking_ID) * 100.0 / (SELECT COUNT(*) FROM ola_bookings), 2) AS Pct_Of_All_Bookings FROM ola_bookings WHERE Booking_Status = 'Canceled by Customer';",
