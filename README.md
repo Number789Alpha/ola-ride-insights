@@ -1,11 +1,21 @@
 # 🚖 OLA Ride Insights — Enterprise Mobility Analytics & Business Intelligence Platform
 
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://ola-ride-insights--dashboard.streamlit.app/)
+[![Deployment](https://img.shields.io/badge/Deployment-Live%20on%20Streamlit%20Cloud-success.svg?style=for-the-badge)](https://ola-ride-insights--dashboard.streamlit.app/)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-[![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io/)
 [![Power BI](https://img.shields.io/badge/Power_BI-F2C811?style=for-the-badge&logo=powerbi&logoColor=black)](https://powerbi.microsoft.com/)
 [![SQLite](https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![Plotly](https://img.shields.io/badge/Plotly-3F4F75?style=for-the-badge&logo=plotly&logoColor=white)](https://plotly.com/)
 [![Pandas](https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white)](https://pandas.pydata.org/)
+
+---
+
+## 🌐 Live Interactive Dashboard
+
+> ### 🚀 **Access the Production Web Application:**  
+> **👉 [https://ola-ride-insights--dashboard.streamlit.app/](https://ola-ride-insights--dashboard.streamlit.app/)**
+>
+> *Zero setup required! Explore the interactive 5-page OLA mobility dashboard, dynamic date/vehicle slicers, real-time SQL Query Studio, and deep-dive operational explanations directly in your browser.*
 
 ---
 
